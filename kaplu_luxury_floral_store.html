@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KAPLU | Haute Floristería & Diseño Botánico</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Vue 3 CDN -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Cormorant Garamond & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        kaplu: {
+                            bg: '#FBF9F5',
+                            card: '#F4F0E8',
+                            dark: '#141413',
+                            accent: '#9E825A',
+                            gold: '#C5A059',
+                            muted: '#6E6B65',
+                            sand: '#E8E2D8'
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['"Cormorant Garamond"', 'serif'],
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #FBF9F5;
+            color: #141413;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+        }
+        .font-serif-title {
+            font-family: 'Cormorant Garamond', serif;
+        }
+        /* Custom scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #FBF9F5;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D1C9BC;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9E825A;
+        }
+        /* Subtle image zoom on hover */
+        .img-zoom-hover {
+            transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .group:hover .img-zoom-hover {
+            transform: scale(1.05);
+        }
+        .fade-in-up {
+            animation: fadeInUp 0.8s ease forwards;
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-kaplu-accent selection:text-white">
+
+    <div id="app" class="min-h-screen flex flex-col justify-between">
+        
+        <!-- TOP ANNOUNCEMENT BANNER -->
+        <div v-if="siteData.announcement.enabled" class="bg-kaplu-dark text-stone-300 text-xs tracking-widest uppercase py-2.5 px-4 text-center font-light flex items-center justify-center gap-2">
+            <span>{{ siteData.announcement.text }}</span>
+            <span v-if="siteData.announcement.linkText" class="underline underline-offset-4 cursor-pointer hover:text-white transition" @click="scrollToSection('catalog')">
+                {{ siteData.announcement.linkText }}
+            </span>
+        </div>
+
+        <!-- HEADER & NAVIGATION -->
+        <header class="sticky top-0 z-40 bg-kaplu-bg/90 backdrop-blur-md border-b border-stone-200/60 transition-all duration-300">
+            <div class="max-w-7xl mx-auto px-6 lg:px-12 h-20 flex items-center justify-between">
+                
+                <!-- Mobile menu toggle -->
+                <button @click="mobileMenuOpen = !mobileMenuOpen" class="lg:hidden text-kaplu-dark text-xl focus:outline-none p-2">
+                    <i :class="mobileMenuOpen ? 'fa-solid fa-xmark' : 'fa-solid fa-bars-staggered'"></i>
+                </button>
+
+                <!-- BRAND LOGO -->
+                <div class="cursor-pointer" @click="currentTab = 'home'">
+                    <template v-if="siteData.brand.logoUrl">
+                        <img :src="siteData.brand.logoUrl" :alt="siteData.brand.name" class="h-10 object-contain">
+                    </template>
+                    <template v-else>
+                        <h1 class="font-serif-title text-3xl md:text-4xl tracking-[0.2em] font-light uppercase text-kaplu-dark">
+                            {{ siteData.brand.name }}
+                        </h1>
+                        <p class="text-[9px] uppercase tracking-[0.35em] text-kaplu-muted text-center -mt-1 font-medium">
+                            {{ siteData.brand.subtitle }}
+                        </p>
+                    </template>
+                </div>
+
+                <!-- DESKTOP NAV -->
+                <nav class="hidden lg:flex items-center space-x-10 text-xs font-medium tracking-[0.18em] uppercase text-stone-700">
+                    <a href="#hero" @click.prevent="currentTab = 'home'; scrollToSection('hero')" class="hover:text-kaplu-accent transition-colors">Portada</a>
+                    <a href="#categories" @click.prevent="currentTab = 'home'; scrollToSection('categories')" class="hover:text-kaplu-accent transition-colors">Colecciones</a>
+                    <a href="#catalog" @click.prevent="currentTab = 'home'; scrollToSection('catalog')" class="hover:text-kaplu-accent transition-colors">Catálogo Autor</a>
+                    <a href="#events" @click.prevent="currentTab = 'home'; scrollToSection('events')" class="hover:text-kaplu-accent transition-colors">Bodas & Eventos</a>
+                    <a href="#gallery" @click.prevent="currentTab = 'home'; scrollToSection('gallery')" class="hover:text-kaplu-accent transition-colors">Galería</a>
+                </nav>
+
+                <!-- RIGHT ACTION BUTTONS -->
+                <div class="flex items-center space-x-5">
+                    <button @click="cartDrawerOpen = true" class="relative p-2 text-stone-800 hover:text-kaplu-accent transition">
+                        <i class="fa-solid fa-bag-shopping text-lg"></i>
+                        <span v-if="cart.length > 0" class="absolute -top-1 -right-1 bg-kaplu-accent text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-medium">
+                            {{ cartCount }}
+                        </span>
+                    </button>
+                    
+                    <!-- ADMIN TOGGLE BUTTON -->
+                    <button @click="isAdminOpen = true" class="inline-flex items-center gap-2 bg-kaplu-dark text-stone-100 hover:bg-kaplu-accent text-xs uppercase tracking-wider px-3.5 py-2 rounded-full transition-all duration-300 shadow-sm">
+                        <i class="fa-solid fa-sliders text-xs"></i>
+                        <span class="hidden sm:inline font-medium">Panel Admin</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- MOBILE NAV MENU -->
+            <div v-if="mobileMenuOpen" class="lg:hidden bg-kaplu-bg border-b border-stone-200 px-6 py-6 space-y-4 text-center">
+                <a @click="mobileMenuOpen = false; currentTab = 'home'; scrollToSection('hero')" class="block text-sm uppercase tracking-widest text-stone-800 py-2">Portada</a>
+                <a @click="mobileMenuOpen = false; currentTab = 'home'; scrollToSection('categories')" class="block text-sm uppercase tracking-widest text-stone-800 py-2">Colecciones</a>
+                <a @click="mobileMenuOpen = false; currentTab = 'home'; scrollToSection('catalog')" class="block text-sm uppercase tracking-widest text-stone-800 py-2">Catálogo</a>
+                <a @click="mobileMenuOpen = false; currentTab = 'home'; scrollToSection('events')" class="block text-sm uppercase tracking-widest text-stone-800 py-2">Bodas & Eventos</a>
+                <a @click="mobileMenuOpen = false; currentTab = 'home'; scrollToSection('gallery')" class="block text-sm uppercase tracking-widest text-stone-800 py-2">Galería</a>
+            </div>
+        </header>
+
+        <!-- MAIN CONTENT CONTAINER -->
+        <main class="flex-grow">
+            
+            <!-- SECTION: PORTADA EDITORIAL (HERO) -->
+            <section id="hero" class="relative min-h-[85vh] lg:min-h-[90vh] flex items-center bg-kaplu-bg overflow-hidden py-12 lg:py-0">
+                <div class="max-w-7xl mx-auto px-6 lg:px-12 w-full">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+                        
+                        <!-- Left Editorial Typography Column -->
+                        <div class="lg:col-span-5 z-10 order-2 lg:order-1 space-y-6 lg:pr-4">
+                            <div class="inline-flex items-center gap-3">
+                                <span class="h-px w-8 bg-kaplu-accent"></span>
+                                <span class="text-xs uppercase tracking-[0.3em] font-medium text-kaplu-accent">
+                                    {{ siteData.hero.tagline }}
+                                </span>
+                            </div>
+                            
+                            <h2 class="font-serif-title text-5xl md:text-6xl lg:text-7xl font-light leading-[1.05] tracking-tight text-kaplu-dark">
+                                {{ siteData.hero.title }}
+                            </h2>
+                            
+                            <p class="text-stone-600 text-sm md:text-base leading-relaxed font-light max-w-lg">
+                                {{ siteData.hero.description }}
+                            </p>
+
+                            <div class="pt-4 flex flex-wrap items-center gap-4">
+                                <button @click="scrollToSection('catalog')" class="bg-kaplu-dark text-stone-100 hover:bg-kaplu-accent px-8 py-4 text-xs uppercase tracking-[0.2em] font-medium transition-all duration-300 shadow-md">
+                                    {{ siteData.hero.buttonPrimaryText }}
+                                </button>
+                                <button @click="scrollToSection('events')" class="border border-stone-800 text-stone-900 hover:bg-stone-900 hover:text-white px-8 py-4 text-xs uppercase tracking-[0.2em] font-medium transition-all duration-300">
+                                    {{ siteData.hero.buttonSecondaryText }}
+                                </button>
+                            </div>
+
+                            <!-- Editorial Stats / Details -->
+                            <div class="pt-8 border-t border-stone-300/60 grid grid-cols-3 gap-4">
+                                <div>
+                                    <p class="font-serif-title text-2xl md:text-3xl font-light text-kaplu-dark">100%</p>
+                                    <p class="text-[10px] uppercase tracking-wider text-stone-500 mt-1">Flor Fresca</p>
+                                </div>
+                                <div>
+                                    <p class="font-serif-title text-2xl md:text-3xl font-light text-kaplu-dark">Custom</p>
+                                    <p class="text-[10px] uppercase tracking-wider text-stone-500 mt-1">Diseño de Autor</p>
+                                </div>
+                                <div>
+                                    <p class="font-serif-title text-2xl md:text-3xl font-light text-kaplu-dark">Express</p>
+                                    <p class="text-[10px] uppercase tracking-wider text-stone-500 mt-1">Delivery Premium</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Editorial Multi-Photo Composition Grid -->
+                        <div class="lg:col-span-7 order-1 lg:order-2 relative">
+                            <div class="relative grid grid-cols-12 gap-4 items-center">
+                                
+                                <!-- Main Hero Photo Frame -->
+                                <div class="col-span-8 relative z-10 overflow-hidden shadow-2xl rounded-sm group">
+                                    <div class="aspect-[3/4] bg-stone-200">
+                                        <img :src="getPhotoUrl(siteData.hero.primaryPhotoId)" :alt="siteData.hero.title" class="w-full h-full object-cover img-zoom-hover">
+                                    </div>
+                                    <div class="absolute bottom-4 left-4 bg-white/80 backdrop-blur-md px-4 py-2 rounded text-[11px] uppercase tracking-widest text-stone-800">
+                                        {{ siteData.hero.photoBadgeText || 'Edición Limitada' }}
+                                    </div>
+                                </div>
+
+                                <!-- Secondary Floating Photo Frame -->
+                                <div class="col-span-4 space-y-4">
+                                    <div class="overflow-hidden shadow-lg rounded-sm aspect-[4/5] bg-stone-200 group">
+                                        <img :src="getPhotoUrl(siteData.hero.secondaryPhotoId)" alt="Detalle Botánico" class="w-full h-full object-cover img-zoom-hover">
+                                    </div>
+                                    <div class="p-4 bg-kaplu-card/80 border border-stone-200/60 rounded-sm hidden sm:block">
+                                        <p class="font-serif-title text-lg italic text-stone-800">"El arte de regalar botánica con propósito visual."</p>
+                                        <p class="text-[10px] uppercase tracking-widest text-kaplu-accent mt-2">— Ateliers Kaplu</p>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <!-- Subtle background decorative block -->
+                            <div class="absolute -bottom-6 -right-6 w-3/4 h-3/4 bg-stone-200/50 -z-10 rounded-sm"></div>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: CATEGORÍAS Y COLECCIONES -->
+            <section id="categories" class="py-20 bg-stone-100/60 border-y border-stone-200/60">
+                <div class="max-w-7xl mx-auto px-6 lg:px-12">
+                    <div class="text-center max-w-2xl mx-auto mb-16 space-y-3">
+                        <span class="text-xs uppercase tracking-[0.3em] font-medium text-kaplu-accent">Curated Collections</span>
+                        <h3 class="font-serif-title text-4xl md:text-5xl font-light text-kaplu-dark">Explorar por Ocasiones</h3>
+                        <div class="w-12 h-0.5 bg-kaplu-accent mx-auto"></div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div v-for="cat in categories" :key="cat.id" 
+                             @click="selectedCategory = cat.name; scrollToSection('catalog')"
+                             class="group cursor-pointer relative overflow-hidden bg-stone-200 aspect-[3/4] shadow-sm rounded-sm">
+                            <img :src="getPhotoUrl(cat.photoId)" :alt="cat.name" class="w-full h-full object-cover img-zoom-hover">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent transition-opacity group-hover:opacity-90"></div>
+                            <div class="absolute inset-0 p-6 flex flex-col justify-end text-white">
+                                <span class="text-[10px] uppercase tracking-[0.25em] text-stone-300 font-light mb-1">{{ cat.itemCount || 'Exclusivo' }} Arreglos</span>
+                                <h4 class="font-serif-title text-2xl font-normal tracking-wide group-hover:text-amber-200 transition-colors">{{ cat.name }}</h4>
+                                <p class="text-xs text-stone-300 line-clamp-2 mt-1 font-light opacity-90">{{ cat.description }}</p>
+                                <span class="inline-flex items-center text-[10px] uppercase tracking-[0.2em] text-amber-200 mt-3 gap-2 font-medium">
+                                    Ver Colección <i class="fa-solid fa-arrow-right text-[9px] group-hover:translate-x-1 transition-transform"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: CATÁLOGO DE PRODUCTOS -->
+            <section id="catalog" class="py-24 max-w-7xl mx-auto px-6 lg:px-12">
+                <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6 border-b border-stone-200 pb-8">
+                    <div>
+                        <span class="text-xs uppercase tracking-[0.3em] font-medium text-kaplu-accent">Haute Floristry</span>
+                        <h3 class="font-serif-title text-4xl md:text-5xl font-light text-kaplu-dark mt-1">Catálogo Principal</h3>
+                    </div>
+
+                    <!-- Category Filters -->
+                    <div class="flex flex-wrap gap-2">
+                        <button @click="selectedCategory = 'Todos'" 
+                                :class="selectedCategory === 'Todos' ? 'bg-kaplu-dark text-white' : 'bg-stone-200/70 text-stone-700 hover:bg-stone-300'"
+                                class="px-4 py-2 text-xs uppercase tracking-wider rounded-full transition font-medium">
+                            Todos
+                        </button>
+                        <button v-for="cat in categories" :key="cat.id" 
+                                @click="selectedCategory = cat.name" 
+                                :class="selectedCategory === cat.name ? 'bg-kaplu-dark text-white' : 'bg-stone-200/70 text-stone-700 hover:bg-stone-300'"
+                                class="px-4 py-2 text-xs uppercase tracking-wider rounded-full transition font-medium">
+                            {{ cat.name }}
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Products Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
+                    <div v-for="product in filteredProducts" :key="product.id" class="group bg-white rounded-sm border border-stone-200/70 p-4 shadow-sm hover:shadow-xl transition-all duration-500 flex flex-col justify-between">
+                        
+                        <!-- Product Main Image Frame -->
+                        <div class="relative overflow-hidden aspect-[4/5] bg-stone-100 cursor-pointer mb-4 rounded-sm" @click="openProductModal(product)">
+                            <img :src="getPhotoUrl(product.photoIds[0])" :alt="product.name" class="w-full h-full object-cover img-zoom-hover">
+                            
+                            <!-- Hover Secondary Image Preview if available -->
+                            <img v-if="product.photoIds.length > 1" :src="getPhotoUrl(product.photoIds[1])" :alt="product.name" class="w-full h-full object-cover absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
+
+                            <!-- Badge -->
+                            <span v-if="product.tag" class="absolute top-3 left-3 bg-kaplu-dark text-white text-[9px] uppercase tracking-[0.2em] px-2.5 py-1 rounded-sm font-medium">
+                                {{ product.tag }}
+                            </span>
+
+                            <button @click.stop="openProductModal(product)" class="absolute bottom-3 right-3 bg-white/90 hover:bg-white text-stone-800 p-2.5 rounded-full shadow-md transition-transform duration-300 group-hover:scale-105">
+                                <i class="fa-solid fa-expand text-xs"></i>
+                            </button>
+                        </div>
+
+                        <!-- Product Information -->
+                        <div class="space-y-2 flex-grow">
+                            <div class="flex items-center justify-between text-[10px] uppercase tracking-widest text-stone-400">
+                                <span>{{ product.category }}</span>
+                                <span v-if="product.photoIds.length > 1" class="text-kaplu-accent font-medium">
+                                    <i class="fa-solid fa-images text-[10px] mr-1"></i>{{ product.photoIds.length }} fotos
+                                </span>
+                            </div>
+                            <h4 class="font-serif-title text-2xl font-normal text-stone-900 group-hover:text-kaplu-accent transition-colors cursor-pointer" @click="openProductModal(product)">
+                                {{ product.name }}
+                            </h4>
+                            <p class="text-xs text-stone-500 line-clamp-2 leading-relaxed font-light">
+                                {{ product.description }}
+                            </p>
+                        </div>
+
+                        <!-- Product Price & Action -->
+                        <div class="pt-4 mt-4 border-t border-stone-100 flex items-center justify-between">
+                            <div>
+                                <span class="font-serif-title text-2xl font-light text-stone-900">${{ product.price }}</span>
+                                <span v-if="product.oldPrice" class="text-xs text-stone-400 line-through ml-2">${{ product.oldPrice }}</span>
+                            </div>
+                            <button @click="addToCart(product)" class="bg-stone-900 hover:bg-kaplu-accent text-white px-4 py-2.5 text-[11px] uppercase tracking-wider font-medium rounded-sm transition-colors flex items-center gap-2">
+                                <i class="fa-solid fa-bag-shopping"></i> Agregar
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: MATRIMONIOS & DECORACIÓN DE EVENTOS -->
+            <section id="events" class="py-24 bg-kaplu-dark text-stone-100 relative overflow-hidden">
+                <div class="max-w-7xl mx-auto px-6 lg:px-12 relative z-10">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                        
+                        <div class="lg:col-span-5 space-y-6">
+                            <span class="text-xs uppercase tracking-[0.3em] font-medium text-amber-200/80">Atelier Editorial</span>
+                            <h3 class="font-serif-title text-4xl md:text-6xl font-light text-white leading-tight">
+                                {{ siteData.events.title }}
+                            </h3>
+                            <p class="text-stone-300 text-sm md:text-base font-light leading-relaxed">
+                                {{ siteData.events.description }}
+                            </p>
+
+                            <div class="space-y-3 py-2 text-xs tracking-wider text-stone-300">
+                                <div class="flex items-center gap-3">
+                                    <i class="fa-solid fa-check text-amber-200"></i>
+                                    <span>Diseño floral exclusivo para novias & enlaces nupciales</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <i class="fa-solid fa-check text-amber-200"></i>
+                                    <span>Montajes a gran escala para galas & marcas de lujo</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <i class="fa-solid fa-check text-amber-200"></i>
+                                    <span>Asesoría botánica y concepto estético personalizado</span>
+                                </div>
+                            </div>
+
+                            <a :href="whatsappConsultationUrl" target="_blank" class="inline-block bg-amber-200 text-stone-950 hover:bg-white px-8 py-4 text-xs uppercase tracking-[0.2em] font-semibold transition-all shadow-lg mt-4">
+                                {{ siteData.events.buttonText }}
+                            </a>
+                        </div>
+
+                        <div class="lg:col-span-7 grid grid-cols-2 gap-4">
+                            <div class="space-y-4">
+                                <div class="aspect-[3/4] overflow-hidden rounded-sm bg-stone-800">
+                                    <img :src="getPhotoUrl(siteData.events.photoId1)" alt="Evento KAPLU 1" class="w-full h-full object-cover hover:scale-105 transition duration-700">
+                                </div>
+                                <div class="aspect-square overflow-hidden rounded-sm bg-stone-800">
+                                    <img :src="getPhotoUrl(siteData.events.photoId2)" alt="Evento KAPLU 2" class="w-full h-full object-cover hover:scale-105 transition duration-700">
+                                </div>
+                            </div>
+                            <div class="space-y-4 pt-8">
+                                <div class="aspect-square overflow-hidden rounded-sm bg-stone-800">
+                                    <img :src="getPhotoUrl(siteData.events.photoId3)" alt="Evento KAPLU 3" class="w-full h-full object-cover hover:scale-105 transition duration-700">
+                                </div>
+                                <div class="aspect-[3/4] overflow-hidden rounded-sm bg-stone-800">
+                                    <img :src="getPhotoUrl(siteData.events.photoId4)" alt="Evento KAPLU 4" class="w-full h-full object-cover hover:scale-105 transition duration-700">
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: GALERÍA EDITORIAL & INSPIRACIÓN -->
+            <section id="gallery" class="py-24 max-w-7xl mx-auto px-6 lg:px-12">
+                <div class="text-center max-w-2xl mx-auto mb-16 space-y-3">
+                    <span class="text-xs uppercase tracking-[0.3em] font-medium text-kaplu-accent">Visual Lookbook</span>
+                    <h3 class="font-serif-title text-4xl md:text-5xl font-light text-kaplu-dark">Galería Editorial KAPLU</h3>
+                    <p class="text-stone-500 text-sm font-light">
+                        Explore nuestras creaciones más representativas, sesiones de diseño y la estética distintiva de nuestra casa floral.
+                    </p>
+                </div>
+
+                <!-- Gallery Masonry / Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div v-for="(photo, index) in galleryPhotos" :key="photo.id" 
+                         class="group relative overflow-hidden bg-stone-200 aspect-square rounded-sm cursor-pointer shadow-sm"
+                         @click="lightboxPhoto = photo">
+                        <img :src="photo.url" :alt="photo.title || 'Foto Galería'" class="w-full h-full object-cover img-zoom-hover">
+                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6 text-white">
+                            <span class="text-[10px] uppercase tracking-widest text-amber-200 font-medium">{{ photo.category || 'Galería' }}</span>
+                            <h5 class="font-serif-title text-2xl font-light mt-1">{{ photo.title || 'KAPLU Botanical Art' }}</h5>
+                            <p v-if="photo.caption" class="text-xs text-stone-200 font-light mt-1">{{ photo.caption }}</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- FOOTER -->
+        <footer class="bg-kaplu-dark text-stone-400 py-16 border-t border-stone-800">
+            <div class="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 md:grid-cols-12 gap-10">
+                
+                <div class="md:col-span-5 space-y-4">
+                    <h4 class="font-serif-title text-3xl tracking-[0.2em] text-white uppercase">{{ siteData.brand.name }}</h4>
+                    <p class="text-xs text-stone-400 font-light leading-relaxed max-w-sm">
+                        {{ siteData.brand.footerText || 'Floristería editorial de alta gama. Arreglos contemporáneos y diseño floral para momentos inolvidables.' }}
+                    </p>
+                    <div class="flex items-center space-x-4 pt-2">
+                        <a v-if="siteData.social.instagram" :href="siteData.social.instagram" target="_blank" class="text-stone-300 hover:text-amber-200 text-lg transition">
+                            <i class="fa-brands fa-instagram"></i>
+                        </a>
+                        <a v-if="siteData.social.tiktok" :href="siteData.social.tiktok" target="_blank" class="text-stone-300 hover:text-amber-200 text-lg transition">
+                            <i class="fa-brands fa-tiktok"></i>
+                        </a>
+                        <a v-if="siteData.social.pinterest" :href="siteData.social.pinterest" target="_blank" class="text-stone-300 hover:text-amber-200 text-lg transition">
+                            <i class="fa-brands fa-pinterest"></i>
+                        </a>
+                        <a v-if="siteData.contact.whatsapp" :href="whatsappConsultationUrl" target="_blank" class="text-stone-300 hover:text-amber-200 text-lg transition">
+                            <i class="fa-brands fa-whatsapp"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="md:col-span-3 space-y-3 text-xs">
+                    <h5 class="text-white uppercase tracking-widest text-xs font-medium mb-3">Atención & Pedidos</h5>
+                    <p><i class="fa-solid fa-phone text-amber-200 mr-2"></i> {{ siteData.contact.phone }}</p>
+                    <p><i class="fa-brands fa-whatsapp text-amber-200 mr-2"></i> {{ siteData.contact.whatsapp }}</p>
+                    <p><i class="fa-solid fa-clock text-amber-200 mr-2"></i> {{ siteData.contact.hours }}</p>
+                    <p><i class="fa-solid fa-truck-fast text-amber-200 mr-2"></i> {{ siteData.contact.deliveryInfo }}</p>
+                </div>
+
+                <div class="md:col-span-4 space-y-3 text-xs">
+                    <h5 class="text-white uppercase tracking-widest text-xs font-medium mb-3">Métodos de Pago</h5>
+                    <p class="text-stone-400 font-light">{{ siteData.contact.paymentMethods }}</p>
+                    <div class="pt-4 border-t border-stone-800 text-[11px] text-stone-500">
+                        &copy; {{ new Date().getFullYear() }} KAPLU Haute Floristry. Todos los derechos reservados.
+                    </div>
+                </div>
+
+            </div>
+        </footer>
+
+        <!-- SHOPPING CART DRAWER -->
+        <div v-if="cartDrawerOpen" class="fixed inset-0 z-50 overflow-hidden">
+            <div class="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity" @click="cartDrawerOpen = false"></div>
+            <div class="fixed inset-y-0 right-0 max-w-full flex pl-10">
+                <div class="w-screen max-w-md bg-kaplu-bg shadow-2xl flex flex-col justify-between p-6">
+                    
+                    <div>
+                        <div class="flex items-center justify-between pb-4 border-b border-stone-200">
+                            <h3 class="font-serif-title text-2xl font-normal text-stone-900">Bolsa de Compras</h3>
+                            <button @click="cartDrawerOpen = false" class="text-stone-500 hover:text-stone-900 text-lg">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+
+                        <div v-if="cart.length === 0" class="py-12 text-center text-stone-500 text-sm font-light">
+                            Tu bolsa de compras está vacía.
+                        </div>
+
+                        <div v-else class="mt-6 space-y-4 max-h-[60vh] overflow-y-auto pr-2">
+                            <div v-for="(item, idx) in cart" :key="idx" class="flex gap-4 items-center bg-white p-3 rounded border border-stone-200">
+                                <img :src="getPhotoUrl(item.product.photoIds[0])" class="w-16 h-20 object-cover rounded">
+                                <div class="flex-grow text-xs space-y-1">
+                                    <h5 class="font-serif-title text-lg font-normal text-stone-900">{{ item.product.name }}</h5>
+                                    <p class="text-stone-600 font-medium">${{ item.product.price }} USD</p>
+                                    <div class="flex items-center gap-2 pt-1">
+                                        <button @click="changeCartQty(idx, -1)" class="w-5 h-5 bg-stone-100 rounded text-stone-700 flex items-center justify-center">-</button>
+                                        <span>{{ item.qty }}</span>
+                                        <button @click="changeCartQty(idx, 1)" class="w-5 h-5 bg-stone-100 rounded text-stone-700 flex items-center justify-center">+</button>
+                                    </div>
+                                </div>
+                                <button @click="removeFromCart(idx)" class="text-red-400 hover:text-red-600 text-sm">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div v-if="cart.length > 0" class="border-t border-stone-200 pt-4 space-y-4">
+                        <div class="flex justify-between items-center text-sm font-medium">
+                            <span>Subtotal Estimado:</span>
+                            <span class="font-serif-title text-2xl text-stone-900">${{ cartTotal }} USD</span>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="block text-[11px] uppercase tracking-wider text-stone-600 font-medium">Mensaje para Tarjeta / Dedicatoria:</label>
+                            <textarea v-model="cartCustomNote" rows="2" placeholder="Escribe el mensaje especial para el destinatario..." class="w-full text-xs p-2.5 bg-white border border-stone-300 rounded focus:ring-1 focus:ring-kaplu-accent focus:outline-none"></textarea>
+                        </div>
+
+                        <a :href="whatsappCheckoutUrl" target="_blank" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white py-3 text-xs uppercase tracking-widest font-semibold rounded text-center flex items-center justify-center gap-2 shadow-md">
+                            <i class="fa-brands fa-whatsapp text-base"></i> Completar Pedido por WhatsApp
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- PRODUCT MULTI-PHOTO DETAIL MODAL -->
+        <div v-if="selectedProductModal" class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+            <div class="bg-kaplu-bg max-w-4xl w-full rounded-sm shadow-2xl overflow-hidden relative grid grid-cols-1 md:grid-cols-12 max-h-[90vh]">
+                
+                <button @click="selectedProductModal = null" class="absolute top-4 right-4 z-20 text-stone-600 hover:text-stone-900 bg-white/80 p-2 rounded-full">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+
+                <!-- Product Gallery Slider / Gallery View -->
+                <div class="md:col-span-7 bg-stone-100 p-6 flex flex-col justify-between">
+                    <div class="aspect-[4/5] overflow-hidden rounded shadow-sm bg-white mb-4">
+                        <img :src="getPhotoUrl(selectedProductModal.photoIds[activePhotoIndex])" class="w-full h-full object-cover">
+                    </div>
+
+                    <!-- Thumbnails row -->
+                    <div class="flex gap-2 overflow-x-auto pb-2">
+                        <img v-for="(pId, pIdx) in selectedProductModal.photoIds" :key="pIdx"
+                             :src="getPhotoUrl(pId)"
+                             @click="activePhotoIndex = pIdx"
+                             :class="activePhotoIndex === pIdx ? 'ring-2 ring-kaplu-accent' : 'opacity-60 hover:opacity-100'"
+                             class="w-16 h-16 object-cover rounded cursor-pointer transition">
+                    </div>
+                </div>
+
+                <!-- Product Details Column -->
+                <div class="md:col-span-5 p-8 flex flex-col justify-between space-y-6 overflow-y-auto">
+                    <div class="space-y-3">
+                        <span class="text-[10px] uppercase tracking-widest text-kaplu-accent font-medium">{{ selectedProductModal.category }}</span>
+                        <h3 class="font-serif-title text-3xl font-light text-stone-900">{{ selectedProductModal.name }}</h3>
+                        <p class="font-serif-title text-3xl text-kaplu-accent font-normal">${{ selectedProductModal.price }} USD</p>
+                        <p class="text-stone-600 text-xs leading-relaxed font-light pt-2">
+                            {{ selectedProductModal.description }}
+                        </p>
+
+                        <div class="pt-4 border-t border-stone-200/80 space-y-2 text-xs text-stone-500">
+                            <p>🌸 <strong>Composición:</strong> {{ selectedProductModal.flowers || 'Selección botánica de la estación' }}</p>
+                            <p>📐 <strong>Dimensiones:</strong> {{ selectedProductModal.size || 'Especial Atelier KAPLU' }}</p>
+                            <p>🎁 <strong>Incluye:</strong> Tarjeta personalizada & empaque de lujo</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3">
+                        <button @click="addToCart(selectedProductModal); selectedProductModal = null" class="w-full bg-kaplu-dark hover:bg-kaplu-accent text-white py-3 text-xs uppercase tracking-widest font-medium rounded transition">
+                            Agregar a la Bolsa
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- LIGHTBOX PHOTO MODAL -->
+        <div v-if="lightboxPhoto" class="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4" @click="lightboxPhoto = null">
+            <div class="max-w-4xl max-h-[90vh] relative" @click.stop>
+                <button @click="lightboxPhoto = null" class="absolute -top-10 right-0 text-white text-xl">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+                <img :src="lightboxPhoto.url" class="max-h-[80vh] w-auto object-contain mx-auto rounded shadow-2xl">
+                <div class="text-center text-white mt-4 space-y-1">
+                    <h4 class="font-serif-title text-2xl">{{ lightboxPhoto.title }}</h4>
+                    <p class="text-xs text-stone-300 font-light">{{ lightboxPhoto.caption }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================================================= -->
+        <!-- PANEL DE ADMINISTRACIÓN COMPLETO DE FOTOGRAFÍAS Y CONTENIDO DE KAPLU      -->
+        <!-- ========================================================================= -->
+        <div v-if="isAdminOpen" class="fixed inset-0 z-50 overflow-hidden bg-stone-900/80 backdrop-blur-md flex justify-end">
+            <div class="w-full max-w-5xl bg-stone-900 text-stone-100 h-full flex flex-col shadow-2xl">
+                
+                <!-- Admin Header Bar -->
+                <div class="px-6 py-4 bg-black border-b border-stone-800 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-3 h-3 rounded-full bg-amber-400"></div>
+                        <h3 class="font-serif-title text-2xl text-white tracking-widest uppercase">Panel Administrador KAPLU</h3>
+                    </div>
+                    <button @click="isAdminOpen = false" class="text-stone-400 hover:text-white px-3 py-1 bg-stone-800 rounded text-xs uppercase">
+                        Cerrar Panel <i class="fa-solid fa-xmark ml-1"></i>
+                    </button>
+                </div>
+
+                <!-- Admin Tabs Nav -->
+                <div class="flex border-b border-stone-800 bg-stone-950/60 overflow-x-auto text-xs uppercase tracking-wider font-medium">
+                    <button @click="adminTab = 'photos'" :class="adminTab === 'photos' ? 'border-b-2 border-amber-400 text-amber-300 bg-stone-800/50' : 'text-stone-400 hover:text-white'" class="px-5 py-3 flex items-center gap-2 whitespace-nowrap">
+                        <i class="fa-solid fa-camera"></i> 📸 Administrador de Fotos
+                    </button>
+                    <button @click="adminTab = 'hero'" :class="adminTab === 'hero' ? 'border-b-2 border-amber-400 text-amber-300 bg-stone-800/50' : 'text-stone-400 hover:text-white'" class="px-5 py-3 flex items-center gap-2 whitespace-nowrap">
+                        <i class="fa-solid fa-image"></i> Portada & Banners
+                    </button>
+                    <button @click="adminTab = 'products'" :class="adminTab === 'products' ? 'border-b-2 border-amber-400 text-amber-300 bg-stone-800/50' : 'text-stone-400 hover:text-white'" class="px-5 py-3 flex items-center gap-2 whitespace-nowrap">
+                        <i class="fa-solid fa-box-open"></i> Productos (Multi-Fotos)
+                    </button>
+                    <button @click="adminTab = 'categories'" :class="adminTab === 'categories' ? 'border-b-2 border-amber-400 text-amber-300 bg-stone-800/50' : 'text-stone-400 hover:text-white'" class="px-5 py-3 flex items-center gap-2 whitespace-nowrap">
+                        <i class="fa-solid fa-layer-group"></i> Categorías
+                    </button>
+                    <button @click="adminTab = 'settings'" :class="adminTab === 'settings' ? 'border-b-2 border-amber-400 text-amber-300 bg-stone-800/50' : 'text-stone-400 hover:text-white'" class="px-5 py-3 flex items-center gap-2 whitespace-nowrap">
+                        <i class="fa-solid fa-gear"></i> Datos & WhatsApp
+                    </button>
+                </div>
+
+                <!-- Admin Body Container -->
+                <div class="flex-grow overflow-y-auto p-6 space-y-8 bg-stone-900">
+
+                    <!-- TAB 1: BANCO DE FOTOGRAFÍAS & SUBIDA MÚLTIPLE -->
+                    <div v-if="adminTab === 'photos'" class="space-y-6">
+                        <div class="bg-stone-800/80 p-6 rounded-lg border border-stone-700">
+                            <h4 class="text-amber-300 text-sm font-semibold uppercase tracking-widest mb-2">📸 Subir Nuevas Fotografías</h4>
+                            <p class="text-xs text-stone-400 mb-4">
+                                Selecciona una o varias imágenes desde tu computadora o celular. Podrás usarlas inmediatamente para la portada, productos, eventos o la galería.
+                            </p>
+                            
+                            <!-- File Upload Area -->
+                            <div class="border-2 border-dashed border-stone-600 hover:border-amber-400 p-8 rounded-lg text-center cursor-pointer bg-stone-950/40 transition" @click="$refs.fileInput.click()">
+                                <input type="file" ref="fileInput" multiple accept="image/*" class="hidden" @change="handleFileUpload">
+                                <i class="fa-solid fa-cloud-arrow-up text-3xl text-amber-400 mb-2"></i>
+                                <p class="text-xs text-stone-200 font-medium">Haz clic aquí para seleccionar imágenes</p>
+                                <p class="text-[10px] text-stone-500 mt-1">Soporta JPG, PNG, WEBP. Carga múltiple activada.</p>
+                            </div>
+                        </div>
+
+                        <!-- Photo Library Grid -->
+                        <div>
+                            <div class="flex justify-between items-center mb-4">
+                                <h4 class="text-sm font-semibold uppercase tracking-wider text-stone-200">
+                                    Galería de Archivos Multimedia ({{ photos.length }} Fotos)
+                                </h4>
+                            </div>
+
+                            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                                <div v-for="photo in photos" :key="photo.id" class="bg-stone-800 p-3 rounded border border-stone-700 flex flex-col justify-between space-y-2 relative group">
+                                    <div class="aspect-square bg-stone-950 overflow-hidden rounded relative">
+                                        <img :src="photo.url" class="w-full h-full object-cover">
+                                        <span class="absolute top-1 left-1 bg-black/70 text-[9px] text-stone-300 px-1.5 py-0.5 rounded">
+                                            ID: {{ photo.id }}
+                                        </span>
+                                    </div>
+
+                                    <div class="space-y-1 text-[11px]">
+                                        <label class="block text-stone-400 font-medium">Título/Categoría:</label>
+                                        <input v-model="photo.title" placeholder="Ej. Rosa Edición Especial" class="w-full bg-stone-900 border border-stone-700 rounded px-2 py-1 text-white text-[11px]">
+                                    </div>
+
+                                    <div class="flex justify-between items-center pt-2 border-t border-stone-700">
+                                        <button @click="deletePhoto(photo.id)" class="text-red-400 hover:text-red-300 text-xs flex items-center gap-1">
+                                            <i class="fa-solid fa-trash"></i> Eliminar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 2: PERSONALIZACIÓN DE PORTADA Y BANNERS -->
+                    <div v-if="adminTab === 'hero'" class="space-y-6">
+                        <div class="bg-stone-800/80 p-6 rounded-lg border border-stone-700 space-y-4">
+                            <h4 class="text-amber-300 text-sm font-semibold uppercase tracking-widest">Ajustes de la Portada Principal</h4>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs text-stone-400 mb-1">Tagline Superior:</label>
+                                    <input v-model="siteData.hero.tagline" class="w-full bg-stone-950 border border-stone-700 rounded p-2 text-xs text-white">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-stone-400 mb-1">Insignia / Badge de la Foto:</label>
+                                    <input v-model="siteData.hero.photoBadgeText" class="w-full bg-stone-950 border border-stone-700 rounded p-2 text-xs text-white">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-xs text-stone-400 mb-1">Título Principal de la Portada:</label>
+                                    <input v-model="siteData.hero.title" class="w-full bg-stone-950 border border-stone-700 rounded p-2 text-xs text-white">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-xs text-stone-400 mb-1">Descripción / Manifiesto Editorial:</label>
+                                    <textarea v-model="siteData.hero.description" rows="3" class="w-full bg-stone-950 border border-stone-700 rounded p-2 text-xs text-white"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Selector de Foto Principal de Portada -->
+                            <div class="pt-4 border-t border-stone-700 grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-xs text-stone-300 font-medium mb-2">Elegir Foto Principal de Portada:</label>
+                                    <select v-model="siteData.hero.primaryPhotoId" class="w-full bg-stone-950 border border-stone-700 rounded p-2 text-xs text-white">
+                                        <option v-for="photo in photos" :key="photo.id" :value="photo.id">
+                                            Photo ID #{{ photo.id }} - {{ photo.title || 'Sin título' }}
+                                        </option>
+                                    </select>
+                                    <div class="mt-3 w-32 h-40 bg-stone-950 rounded overflow-hidden border border-stone-700">
+                                        <img :src="getPhotoUrl(siteData.hero.primaryPhotoId)" class="w-full h-full object-cover">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs text-stone-300 font-medium mb-2">Elegir Foto Secundaria de Portada:</label>
+                                    <select v-model="siteData.hero.secondaryPhotoId" class="w-full bg-stone-950 border border-stone-700 rounded p-2 text-xs text-white">
+                                        <option v-for="photo in photos" :key="photo.id" :value="photo.id">
+                                            Photo ID #{{ photo.id }} - {{ photo.title || 'Sin título' }}
+                                        </option>
+                                    </select>
+                                    <div class="mt-3 w-32 h-40 bg-stone-950 rounded overflow-hidden border border-stone-700">
+                                        <img :src="getPhotoUrl(siteData.hero.secondaryPhotoId)" class="w-full h-full object-cover">
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- TAB 3: GESTIÓN DE PRODUCTOS Y MÚLTIPLES FOTOS -->
+                    <div v-if="adminTab === 'products'" class="space-y-6">
+                        <div class="flex justify-between items-center">
+                            <h4 class="text-sm font-semibold uppercase tracking-wider text-amber-300">Catálogo de Productos</h4>
+                            <button @click="addNewProduct" class="bg-amber-400 hover:bg-amber-500 text-stone-950 px-4 py-2 text-xs font-semibold rounded flex items-center gap-2">
+                                <i class="fa-solid fa-plus"></i> Crear Nuevo Producto
+                            </button>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div v-for="(prod, pIndex) in products" :key="prod.id" class="bg-stone-800 p-6 rounded-lg border border-stone-700 space-y-4">
+                                <div class="flex justify-between items-start">
+                                    <h5 class="text-white font-medium text-sm">Producto #{{ pIndex + 1 }}: {{ prod.name }}</h5>
+                                    <button @click="deleteProduct(pIndex)" class="text-red-400 text-xs hover:text-red-300">
+                                        <i class="fa-solid fa-trash"></i> Eliminar
+                                    </button>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                                    <div>
+                                        <label class="block text-stone-400 mb-1">Nombre del Producto:</label>
+                                        <input v-model="prod.name" class="w-full bg-stone-950 border border-stone-700 rounded p-2 text-white">
+                                    </div>
+                                    <div>
+                                        <label class="block text-stone-400 mb-1">Precio ($ USD):</label>
+                                        <input v-model.number="prod.price" type="number" class="w-full bg-stone-950 border border-stone-700 rounded p-2 text-white">
+                                    </div>
+                                    <div>
+                                        <label class="block text-stone-400 mb-1">Categoría:</label>
+                                        <input v-model="prod.category" class="w-full bg-stone-950 border border-stone-700 rounded p-2 text-white">
+                                    </div>
+                                    <div class="md:col-span-3">
+                                        <label class="block text-stone-400 mb-1">Descripción:</label>
+                                        <textarea v-model="prod.description" rows="2" class="w-full bg-stone-950 border border-stone-700 rounded p-2 text-white"></textarea>
+                                    </div>
+                                </div>
+
+                                <!-- Multi-Photo Manager for this specific Product -->
+                                <div class="pt-4 border-t border-stone-700">
+                                    <label class="block text-xs text-amber-300 font-medium mb-2">📸 Fotografías Asociadas a este Producto (Multi-Foto):</label>
+                                    
+                                    <div class="flex flex-wrap gap-3 mb-3">
+                                        <div v-for="(photoId, imgIdx) in prod.photoIds" :key="imgIdx" class="relative w-20 h-24 bg-stone-950 rounded overflow-hidden border border-stone-600 group">
+                                            <img :src="getPhotoUrl(photoId)" class="w-full h-full object-cover">
+                                            <button @click="removePhotoFromProduct(prod, imgIdx)" class="absolute top-1 right-1 bg-red-600 text-white rounded-full w-4 h-4 text-[9px] flex items-center justify-center">
+                                                ×
+                                            </button>
+                                            <span class="absolute bottom-0 inset-x-0 bg-black/80 text-[8px] text-center text-stone-300 py-0.5">
+                                                Foto {{ imgIdx + 1 }}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Add Photo to Product Selector -->
+                                    <div class="flex gap-2 max-w-md">
+                                        <select v-model="selectedAddPhotoId[prod.id]" class="bg-stone-950 border border-stone-700 rounded px-2 py-1 text-xs text-white flex-grow">
+                                            <option value="">-- Seleccionar foto del Banco --</option>
+                                            <option v-for="photo in photos" :key="photo.id" :value="photo.id">
+                                                ID #{{ photo.id }} - {{ photo.title }}
+                                            </option>
+                                        </select>
+                                        <button @click="addPhotoToProduct(prod)" class="bg-stone-700 hover:bg-stone-600 text-xs px-3 py-1 rounded text-white font-medium">
+                                            Añadir Foto
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 4: CATEGORÍAS -->
+                    <div v-if="adminTab === 'categories'" class="space-y-6">
+                        <h4 class="text-sm font-semibold uppercase tracking-wider text-amber-300">Colecciones & Ocasiones</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div v-for="cat in categories" :key="cat.id" class="bg-stone-800 p-4 rounded border border-stone-700 space-y-3">
+                                <div>
+                                    <label class="block text-xs text-stone-400 mb-1">Nombre Categoria:</label>
+                                    <input v-model="cat.name" class="w-full bg-stone-950 border border-stone-700 rounded p-2 text-xs text-white">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-stone-400 mb-1">Descripción Corta:</label>
+                                    <input v-model="cat.description" class="w-full bg-stone-950 border border-stone-700 rounded p-2 text-xs text-white">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-stone-400 mb-1">Imagen de Categoria:</label>
+                                    <select v-model="cat.photoId" class="w-full bg-stone-950 border border-stone-700 rounded p-2 text-xs text-white">
+                                        <option v-for="photo in photos" :key="photo.id" :value="photo.id">
+                                            ID #{{ photo.id }} - {{ photo.title }}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 5: CONTACTO, REDES Y WHATSAPP -->
+                    <div v-if="adminTab === 'settings'" class="space-y-6">
+                        <div class="bg-stone-800/80 p-6 rounded-lg border border-stone-700 space-y-4">
+                            <h4 class="text-amber-300 text-sm font-semibold uppercase tracking-widest">Información de Marca & WhatsApp</h4>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                                <div>
+                                    <label class="block text-stone-400 mb-1">Número de WhatsApp (con código de país, sin +):</label>
+                                    <input v-model="siteData.contact.whatsapp" class="w-full bg-stone-950 border border-stone-700 rounded p-2 text-white" placeholder="Ej: 51987654321">
+                                </div>
+                                <div>
+                                    <label class="block text-stone-400 mb-1">Teléfono de Contacto:</label>
+                                    <input v-model="siteData.contact.phone" class="w-full bg-stone-950 border border-stone-700 rounded p-2 text-white">
+                                </div>
+                                <div>
+                                    <label class="block text-stone-400 mb-1">Horario de Atención:</label>
+                                    <input v-model="siteData.contact.hours" class="w-full bg-stone-950 border border-stone-700 rounded p-2 text-white">
+                                </div>
+                                <div>
+                                    <label class="block text-stone-400 mb-1">Información de Delivery:</label>
+                                    <input v-model="siteData.contact.deliveryInfo" class="w-full bg-stone-950 border border-stone-700 rounded p-2 text-white">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-stone-400 mb-1">Métodos de Pago Aceptados:</label>
+                                    <input v-model="siteData.contact.paymentMethods" class="w-full bg-stone-950 border border-stone-700 rounded p-2 text-white">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Admin Footer Bar -->
+                <div class="px-6 py-4 bg-black border-t border-stone-800 flex justify-between items-center text-xs">
+                    <span class="text-stone-400">✨ Los cambios se aplican automáticamente a la tienda.</span>
+                    <button @click="isAdminOpen = false" class="bg-amber-400 hover:bg-amber-500 text-stone-950 font-semibold px-6 py-2.5 rounded shadow">
+                        Guardar & Volver a la Tienda
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    currentTab: 'home',
+                    mobileMenuOpen: false,
+                    isAdminOpen: false,
+                    adminTab: 'photos',
+                    selectedCategory: 'Todos',
+                    cartDrawerOpen: false,
+                    cartCustomNote: '',
+                    selectedProductModal: null,
+                    activePhotoIndex: 0,
+                    lightboxPhoto: null,
+                    selectedAddPhotoId: {},
+
+                    // Default Photo Library (High-Resolution Unsplash Fine Floral Photography)
+                    photos: [
+                        { id: 101, url: 'https://images.unsplash.com/photo-1561181286-d3fee7d55364?auto=format&fit=crop&w=1200&q=80', title: 'Rosa Editorial Carmín', category: 'Portada' },
+                        { id: 102, url: 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&w=1000&q=80', title: 'Composición Silvestre', category: 'Portada' },
+                        { id: 103, url: 'https://images.unsplash.com/photo-1508610048659-a06b669e3321?auto=format&fit=crop&w=1000&q=80', title: 'Peonías Rosadas', category: 'Producto' },
+                        { id: 104, url: 'https://images.unsplash.com/photo-1582794543139-8ac9cb0f7b11?auto=format&fit=crop&w=1000&q=80', title: 'Orquídeas Esculturales', category: 'Producto' },
+                        { id: 105, url: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=1000&q=80', title: 'Enlace Nupcial KAPLU', category: 'Eventos' },
+                        { id: 106, url: 'https://images.unsplash.com/photo-1527061011665-3652c757a4d4?auto=format&fit=crop&w=1000&q=80', title: 'Tulipanes Blancos', category: 'Producto' },
+                        { id: 107, url: 'https://images.unsplash.com/photo-1563241527-3004b7be0ffd?auto=format&fit=crop&w=1000&q=80', title: 'Ramo Novia Monocromo', category: 'Eventos' },
+                        { id: 108, url: 'https://images.unsplash.com/photo-1507290439931-a861b5a38200?auto=format&fit=crop&w=1000&q=80', title: 'Detalle Botánico', category: 'Galería' }
+                    ],
+
+                    // Main Site Content Data
+                    siteData: {
+                        brand: {
+                            name: 'KAPLU',
+                            subtitle: 'Haute Floristería & Botánica',
+                            logoUrl: '',
+                            footerText: 'KAPLU es una firma boutique de diseño floral contemporáneo dedicada a crear composiciones artísticas memorables.'
+                        },
+                        announcement: {
+                            enabled: true,
+                            text: 'Envíos exclusivos express el mismo día en pedidos anteriores a la 1:00 PM',
+                            linkText: 'Ver Colección Nupcial'
+                        },
+                        hero: {
+                            tagline: 'Edición Limitada',
+                            title: 'El Arte de la Escultura Botánica',
+                            description: 'Composiciones florales de lujo diseñadas con visión editorial, flores frescas importadas y una presentación sofisticada única.',
+                            buttonPrimaryText: 'Explorar Catálogo',
+                            buttonSecondaryText: 'Bodas & Eventos',
+                            photoBadgeText: 'Selección de la Estación',
+                            primaryPhotoId: 101,
+                            secondaryPhotoId: 102
+                        },
+                        events: {
+                            title: 'Envíos & Escenografía para Bodas y Eventos',
+                            description: 'Transformamos espacios en experiencias sensoriales inolvidables con instalaciones florales monumentales e íntimas.',
+                            buttonText: 'Solicitar Cotización Privada',
+                            photoId1: 105,
+                            photoId2: 107,
+                            photoId3: 102,
+                            photoId4: 108
+                        },
+                        contact: {
+                            whatsapp: '51987654321',
+                            phone: '+51 987 654 321',
+                            hours: 'Lunes a Sábado: 8:00 AM - 8:00 PM',
+                            deliveryInfo: 'Delivery Express con empaque térmico de protección',
+                            paymentMethods: 'Tarjetas de Crédito, Transferencias Directas, Zelle & Yape'
+                        },
+                        social: {
+                            instagram: 'https://instagram.com',
+                            tiktok: 'https://tiktok.com',
+                            pinterest: 'https://pinterest.com'
+                        }
+                    },
+
+                    // Categories List
+                    categories: [
+                        { id: 1, name: 'Aniversario & Amor', description: 'Ramos de autor con peonías, rosas seleccionadas y follajes raros.', photoId: 101, itemCount: 12 },
+                        { id: 2, name: 'Cajas Preservadas', description: 'Flores eternas tratadas artesanalmente con duración de años.', photoId: 104, itemCount: 8 },
+                        { id: 3, name: 'Bodas & Novias', description: 'Diseño exclusivo de ramos de novia, corsages y boutonnières.', photoId: 107, itemCount: 15 },
+                        { id: 4, name: 'Botánica de Diseño', description: 'Orquídeas phalaenopsis en macetas de cerámica artesanal.', photoId: 108, itemCount: 6 }
+                    ],
+
+                    // Products Catalog with Multi-Photo ID arrays
+                    products: [
+                        {
+                            id: 'prod-1',
+                            name: 'El Gran Carmín KAPLU',
+                            price: 145,
+                            oldPrice: 170,
+                            category: 'Aniversario & Amor',
+                            tag: 'Best Seller',
+                            description: 'Un majestuoso ensamble de 36 rosas Carmín seleccionadas a mano con follaje de eucalipto dólar en jarrón cerámico tallado.',
+                            flowers: 'Rosas de tallo largo, Eucalipto silvestre, Ranúnculos',
+                            size: 'Alta dimensión (70cm x 50cm)',
+                            photoIds: [101, 102, 108]
+                        },
+                        {
+                            id: 'prod-2',
+                            name: 'Orquídea Blanca Imperial',
+                            price: 120,
+                            category: 'Botánica de Diseño',
+                            tag: 'Exclusivo',
+                            description: 'Doble vara de Orquídea Phalaenopsis blanca pura en macetero de arcilla con acabado minimalista.',
+                            flowers: 'Phalaenopsis Imperial, Musgo vivo',
+                            size: 'Mediano (60cm x 30cm)',
+                            photoIds: [104, 106]
+                        },
+                        {
+                            id: 'prod-3',
+                            name: 'Ramo Nupcial Peonía & Seda',
+                            price: 190,
+                            category: 'Bodas & Novias',
+                            tag: 'Alta Costura',
+                            description: 'Composición orgánica con peonías en tono rubor, ranúnculos y cinta de seda natural teñida a mano.',
+                            flowers: 'Peonías Coral Sunset, Ranúnculos, Lisianthus',
+                            size: 'Ramo de Novia (40cm x 35cm)',
+                            photoIds: [103, 107, 105]
+                        }
+                    ],
+
+                    // Cart State
+                    cart: []
+                };
+            },
+            computed: {
+                filteredProducts() {
+                    if (this.selectedCategory === 'Todos') return this.products;
+                    return this.products.filter(p => p.category === this.selectedCategory);
+                },
+                galleryPhotos() {
+                    return this.photos;
+                },
+                cartCount() {
+                    return this.cart.reduce((sum, item) => sum + item.qty, 0);
+                },
+                cartTotal() {
+                    return this.cart.reduce((sum, item) => sum + (item.product.price * item.qty), 0);
+                },
+                whatsappCheckoutUrl() {
+                    let text = `*NUEVO PEDIDO DESDE KAPLU FLORISTERÍA*\n\n`;
+                    this.cart.forEach((item, i) => {
+                        text += `${i + 1}. ${item.product.name} (x${item.qty}) - $${item.product.price * item.qty} USD\n`;
+                    });
+                    text += `\n*TOTAL:* $${this.cartTotal} USD\n`;
+                    if (this.cartCustomNote) {
+                        text += `\n*Mensaje para tarjeta:* "${this.cartCustomNote}"\n`;
+                    }
+                    text += `\nPor favor confirmar disponibilidad y detalles de envío.`;
+                    return `https://wa.me/${this.siteData.contact.whatsapp}?text=${encodeURIComponent(text)}`;
+                },
+                whatsappConsultationUrl() {
+                    const text = `Hola Atelier KAPLU, me gustaría solicitar información y asesoría para la decoración floral de un evento / boda.`;
+                    return `https://wa.me/${this.siteData.contact.whatsapp}?text=${encodeURIComponent(text)}`;
+                }
+            },
+            methods: {
+                getPhotoUrl(photoId) {
+                    const found = this.photos.find(p => p.id === photoId);
+                    return found ? found.url : 'https://images.unsplash.com/photo-1561181286-d3fee7d55364?auto=format&fit=crop&w=800&q=80';
+                },
+                scrollToSection(id) {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        el.scrollIntoView({ behavior: 'smooth' });
+                    }
+                },
+                openProductModal(product) {
+                    this.selectedProductModal = product;
+                    this.activePhotoIndex = 0;
+                },
+                addToCart(product) {
+                    const existing = this.cart.find(item => item.product.id === product.id);
+                    if (existing) {
+                        existing.qty++;
+                    } else {
+                        this.cart.push({ product, qty: 1 });
+                    }
+                    this.cartDrawerOpen = true;
+                },
+                changeCartQty(index, delta) {
+                    this.cart[index].qty += delta;
+                    if (this.cart[index].qty <= 0) {
+                        this.cart.splice(index, 1);
+                    }
+                },
+                removeFromCart(index) {
+                    this.cart.splice(index, 1);
+                },
+
+                // PHOTO UPLOADER METHOD (Local Base64 / Data URL Reader)
+                handleFileUpload(event) {
+                    const files = event.target.files;
+                    if (!files || files.length === 0) return;
+
+                    Array.from(files).forEach((file, idx) => {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            const newPhoto = {
+                                id: Date.now() + idx,
+                                url: e.target.result,
+                                title: file.name.split('.')[0] || 'Nueva Fotografía',
+                                category: 'Cargada'
+                            };
+                            this.photos.unshift(newPhoto);
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                },
+                deletePhoto(id) {
+                    this.photos = this.photos.filter(p => p.id !== id);
+                },
+
+                // PRODUCT ADMIN METHODS
+                addNewProduct() {
+                    const newId = 'prod-' + (this.products.length + 1);
+                    const defaultPhotoId = this.photos.length > 0 ? this.photos[0].id : 101;
+                    this.products.push({
+                        id: newId,
+                        name: 'Nuevo Arreglo KAPLU',
+                        price: 95,
+                        category: 'Aniversario & Amor',
+                        tag: 'Nuevo',
+                        description: 'Descripción detallada del arreglo floral...',
+                        flowers: 'Flor de estación',
+                        size: 'Estándar',
+                        photoIds: [defaultPhotoId]
+                    });
+                },
+                deleteProduct(index) {
+                    this.products.splice(index, 1);
+                },
+                addPhotoToProduct(prod) {
+                    const photoId = this.selectedAddPhotoId[prod.id];
+                    if (photoId) {
+                        prod.photoIds.push(Number(photoId));
+                        this.selectedAddPhotoId[prod.id] = '';
+                    }
+                },
+                removePhotoFromProduct(prod, imgIndex) {
+                    if (prod.photoIds.length <= 1) {
+                        alert('Un producto debe tener al menos 1 fotografía.');
+                        return;
+                    }
+                    prod.photoIds.splice(imgIndex, 1);
+                }
+            }
+        }).mount('#app');
+    </script>
+
+</body>
+</html>
